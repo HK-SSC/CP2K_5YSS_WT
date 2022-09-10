@@ -1,0 +1,211 @@
+&GLOBAL
+  PROJECT MONITOR
+  PRINT_LEVEL LOW
+  RUN_TYPE MD
+&END GLOBAL
+
+&FORCE_EVAL
+  METHOD QMMM
+  STRESS_TENSOR ANALYTICAL
+  &DFT
+    CHARGE -2
+    &QS
+      METHOD AM1
+      &SE
+         &COULOMB
+           CUTOFF [angstrom] 10.0
+         &END
+         &EXCHANGE
+           CUTOFF [angstrom] 10.0
+         &END
+      &END
+    &END QS
+    &SCF
+      MAX_SCF 30
+      EPS_SCF 1.0E-6
+      SCF_GUESS ATOMIC
+      &OT
+        MINIMIZER DIIS
+        PRECONDITIONER FULL_SINGLE_INVERSE
+      &END
+      &OUTER_SCF
+        EPS_SCF 1.0E-6
+        MAX_SCF 10
+      &END
+      &PRINT
+        &RESTART OFF
+        &END
+        &RESTART_HISTORY OFF
+        &END
+      &END
+    &END SCF
+  &END DFT
+  &MM
+    &FORCEFIELD
+      PARMTYPE AMBER
+      PARM_FILE_NAME complex_LJ_mod.prmtop
+      &SPLINE
+        EMAX_SPLINE 1.0E8
+        RCUT_NB [angstrom] 10
+      &END SPLINE
+    &END FORCEFIELD
+    &POISSON
+      &EWALD
+        EWALD_TYPE SPME
+        ALPHA .40
+        GMAX 80
+      &END EWALD
+    &END POISSON
+  &END MM
+  &SUBSYS
+    &CELL
+      ABC [angstrom] 79.0893744057 79.0893744057 79.0893744057
+      ALPHA_BETA_GAMMA 90 90 90
+    &END CELL
+    &TOPOLOGY
+      CONN_FILE_FORMAT AMBER
+      CONN_FILE_NAME complex_LJ_mod.prmtop
+    &END TOPOLOGY
+    &KIND NA+
+     ELEMENT Na
+    &END KIND
+  &END SUBSYS
+  &QMMM
+    ECOUPL COULOMB
+    &CELL
+      ABC 50 50 50
+      ALPHA_BETA_GAMMA 90 90 90
+    &END CELL
+    &QM_KIND  O
+    MM_INDEX 3075
+    MM_INDEX 3543
+    MM_INDEX 3663
+    MM_INDEX 4003
+    MM_INDEX 4617
+    MM_INDEX 4618
+    &END QM_KIND
+    &QM_KIND  H
+    MM_INDEX 3076
+    MM_INDEX 3077
+    MM_INDEX 3078
+    MM_INDEX 3544
+    MM_INDEX 3545
+    MM_INDEX 3564
+    MM_INDEX 3565
+    MM_INDEX 3634
+    MM_INDEX 3635
+    MM_INDEX 3636
+    MM_INDEX 3637
+    MM_INDEX 3664
+    MM_INDEX 3665
+    MM_INDEX 3943
+    MM_INDEX 3944
+    MM_INDEX 4004
+    MM_INDEX 4005
+    MM_INDEX 4006
+    MM_INDEX 4619
+    MM_INDEX 4620
+    MM_INDEX 4621
+    MM_INDEX 4622
+    MM_INDEX 4623
+    MM_INDEX 4624
+    MM_INDEX 4625
+    MM_INDEX 4626
+    MM_INDEX 4627
+    MM_INDEX 4628
+    MM_INDEX 4629
+    MM_INDEX 4630
+    &END QM_KIND
+    &QM_KIND  C
+    MM_INDEX 3071
+    MM_INDEX 3072
+    MM_INDEX 3073
+    MM_INDEX 3542
+    MM_INDEX 3558
+    MM_INDEX 3559
+    MM_INDEX 3560
+    MM_INDEX 3562
+    MM_INDEX 3629
+    MM_INDEX 3630
+    MM_INDEX 3631
+    MM_INDEX 3632
+    MM_INDEX 3656
+    MM_INDEX 3657
+    MM_INDEX 3658
+    MM_INDEX 3659
+    MM_INDEX 3660
+    MM_INDEX 3661
+    MM_INDEX 3662
+    MM_INDEX 3933
+    MM_INDEX 3934
+    MM_INDEX 3935
+    MM_INDEX 3936
+    MM_INDEX 3937
+    MM_INDEX 3938
+    MM_INDEX 3940
+    MM_INDEX 3941
+    MM_INDEX 3942
+    MM_INDEX 3999
+    MM_INDEX 4000
+    MM_INDEX 4001
+    MM_INDEX 4612
+    MM_INDEX 4613
+    MM_INDEX 4614
+    MM_INDEX 4615
+    MM_INDEX 4616
+    &END QM_KIND
+    &QM_KIND  N
+    MM_INDEX 3074
+    MM_INDEX 3561
+    MM_INDEX 3563
+    MM_INDEX 3939
+    MM_INDEX 4002
+    MM_INDEX 4611
+    MM_INDEX 3633
+    &END QM_KIND
+    &LINK
+    MM_INDEX 3068 3539 3555 3626 3653 3930 3996
+    QM_INDEX 3071 3542 3558 3629 3656 3933 3999
+    LINK_TYPE IMOMM
+    &END LINK
+  &END QMMM
+&END FORCE_EVAL
+&MOTION
+  &MD
+  ENSEMBLE NVT
+  TIMESTEP [fs] 0.5
+  STEPS    10000  !5000 fs = 5ps
+  TEMPERATURE 298
+  &THERMOSTAT
+    TYPE NOSE
+    REGION GLOBAL
+    &NOSE
+      TIMECON [fs] 100.
+    &END NOSE
+  &END THERMOSTAT
+  &END MD
+   &PRINT
+    &RESTART                                    ! This section controls the printing of restart files
+      &EACH                                     ! A restart file will be printed every 10000 md steps
+        MD 1000
+      &END
+    &END
+    &RESTART_HISTORY                            ! This section controls dumping of unique restart files during the run keeping all of them.Most useful if recovery is needed at a later point.
+      &EACH                                     ! A new restart file will be printed every 10000 md steps
+        MD 1000
+      &END
+    &END
+    &TRAJECTORY                                 ! Thes section Controls the output of the trajectory
+      FORMAT XYZ                                ! Format of the output trajectory is XYZ
+      &EACH                                     ! New trajectory frame will be printed each 100 md steps
+        MD 1000
+      &END
+    &END
+  &END PRINT
+&END MOTION
+
+&EXT_RESTART
+  RESTART_FILE_NAME NPT-1.restart
+  RESTART_COUNTERS .FALSE.
+  RESTART_THERMOSTAT .FALSE.
+&END
